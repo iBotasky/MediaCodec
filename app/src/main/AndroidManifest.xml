@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DecodeActivity" />
+        <activity android:name=".ExtractorActivity" />
     </application>
 
 </manifest>

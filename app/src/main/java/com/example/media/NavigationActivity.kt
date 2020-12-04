@@ -23,7 +23,7 @@ class NavigationActivity : AppCompatActivity() {
         }
 
         muxerVideo.setOnClickListener {
-
+            startActivity(Intent(NavigationActivity@ this, ExtractorActivity::class.java))
         }
     }
 }
