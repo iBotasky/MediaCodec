@@ -3,31 +3,23 @@ package com.example.media
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class MainActivity : AppCompatActivity() {
+class DecodeActivity : AppCompatActivity() {
     companion object {
         const val TAG = "VideoTrack"
     }
-
-    // 解码器
-    private var mVideoDecoder: MediaCodec? = null
-
-    // 编码器
-    private var mVideoEncoder: MediaCodec? = null
-
-    // Muxer
-    private var mMediaMuxer: MediaMuxer? = null
-
-    // 提取器
-    private var mExtractor: MediaExtractor? = null
 
     private var mVideoTrack: Int = -1
     private var mVideoFormat: MediaFormat? = null
@@ -44,51 +36,53 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mBtnVideoTrack.setOnClickListener {
-            Thread(Runnable {
-                initMediaCodeces()
-                decode()
-            }).start()
-        }
-    }
-
-    private fun initMediaCodeces() {
-        Log.e(TAG, "===============初始化解编码器===============")
-        mExtractor = MediaExtractor()
-        mExtractor?.setDataSource(ORIGINAL_VIDEO)
-        // 遍历提取器的轨道，获取格式
-        mExtractor?.apply {
-            for (i in 0 until this.trackCount) {
-                val mediaFormat = this.getTrackFormat(i)
-                val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
-                if (mime != null && mime.startsWith("video/")) {
-                    mVideoTrack = i
-                    mVideoFormat = mediaFormat
-                    break
+            lifecycleScope.launch {
+                mBtnVideoTrack.isEnabled = false
+                withContext(Dispatchers.Default) {
+                    startDecodeVideo()
                 }
+                mBtnVideoTrack.isEnabled = true
             }
-            if (mVideoTrack >= 0) {
-                this.selectTrack(mVideoTrack)
-            }
-            // 创建解码器
-            val mime = this.getTrackFormat(mVideoTrack).getString(MediaFormat.KEY_MIME)
-            mVideoDecoder = MediaCodec.createDecoderByType(mime!!)
-            mVideoDecoder!!.configure(mVideoFormat, Surface(mTextureView.surfaceTexture), null, 0);
-            mVideoDecoder!!.start()
         }
     }
 
-    private fun decode() {
+
+    private fun startDecodeVideo() {
+        Log.e(TAG, "===============初始化解编码器===============")
+        val mExtractor = MediaExtractor()
+        mExtractor.setDataSource(ORIGINAL_VIDEO)
+        // 遍历提取器的轨道，获取格式
+
+        for (i in 0 until mExtractor.trackCount) {
+            val mediaFormat = mExtractor.getTrackFormat(i)
+            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
+            if (mime != null && mime.startsWith("video/")) {
+                mVideoTrack = i
+                mVideoFormat = mediaFormat
+                break
+            }
+        }
+        if (mVideoTrack >= 0) {
+            mExtractor.selectTrack(mVideoTrack)
+        }
+        // 创建解码器
+        val mime = mExtractor.getTrackFormat(mVideoTrack).getString(MediaFormat.KEY_MIME)
+        val mVideoDecoder = MediaCodec.createDecoderByType(mime!!)
+        mVideoDecoder.configure(mVideoFormat, Surface(mTextureView.surfaceTexture), null, 0);
+        mVideoDecoder.start()
+
+        // 开始编码并渲染
         var curSampleFlags = -1
         var curSampleTime = -1L
         var totalSize = 0L
-        mVideoDecoder?.apply {
+        mVideoDecoder.apply {
             isRunning = true
             isEOS = false
             //选择要解析的轨道
-            mExtractor!!.selectTrack(mVideoTrack);
+            mExtractor.selectTrack(mVideoTrack);
             try {
                 // 用来存放每次decode帧的bufferInfo
-                var info = MediaCodec.BufferInfo()
+                val info = MediaCodec.BufferInfo()
                 while (isRunning) {
                     Log.e(TAG, "===============Running===============")
                     /**
@@ -107,16 +101,16 @@ class MainActivity : AppCompatActivity() {
                                 b.clear()
 
                                 //读取当前帧的数据
-                                val buffercount: Int = mExtractor!!.readSampleData(b, 0)
+                                val buffercount: Int = mExtractor.readSampleData(b, 0)
                                 if (buffercount < 0) {
                                     size = -1
                                 } else {
                                     //记录当前时间戳
-                                    curSampleTime = mExtractor!!.sampleTime
+                                    curSampleTime = mExtractor.sampleTime
                                     //记录当前帧的标志位
-                                    curSampleFlags = mExtractor!!.sampleFlags
+                                    curSampleFlags = mExtractor.sampleFlags
                                     //进入下一帧
-                                    mExtractor!!.advance()
+                                    mExtractor.advance()
                                     size = buffercount
                                 }
                                 if (size >= 0) {
@@ -124,9 +118,9 @@ class MainActivity : AppCompatActivity() {
                                         inputBufferId,
                                         0,
                                         size,
-                                        0, 0
-//                                    mExtractor!!.sampleTime,
-//                                    mExtractor!!.sampleFlags
+//                                        0, 0
+                                        mExtractor.sampleTime,
+                                        mExtractor.sampleFlags
                                     )
                                     Log.e(TAG, "queueInput:$size")
                                 } else {
@@ -180,14 +174,14 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             } finally {
                 isRunning = false
-                mVideoDecoder?.apply {
-                    this.stop()
-                    this.release()
+                try {
+                    mVideoDecoder.stop()
+                    mVideoDecoder.release()
+                    mExtractor.release()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-                mExtractor?.release()
-
             }
         }
     }
-
 }
