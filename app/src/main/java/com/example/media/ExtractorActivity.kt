@@ -21,7 +21,7 @@ class ExtractorActivity : AppCompatActivity() {
     val videoOutPath =
         "${Environment.getExternalStorageDirectory().absolutePath}/extractor_video.mp4"
     val audioOutPath =
-        "${Environment.getExternalStorageDirectory().absolutePath}/extractor_audio.mp3"
+        "${Environment.getExternalStorageDirectory().absolutePath}/extractor_audio.mp4"
     val sourcePath = "${Environment.getExternalStorageDirectory().absolutePath}/1.mp4"
 
     companion object {
@@ -74,12 +74,14 @@ class ExtractorActivity : AppCompatActivity() {
         }
 
         // 创建Muxer合成器，合成音频/视频/音视频
-        if (videoMediaFormat != null) {
-            val mMuxer = MediaMuxer(videoOutPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            mMuxer.addTrack(videoMediaFormat)
+        Log.e(TAG, "extractorVideo: ${audioTrack!!} ${videoTrack}" )
+        if (videoMediaFormat != null && audioMediaFormat != null) {
+            val mVideoMuxer = MediaMuxer(videoOutPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val mAudioMuxer = MediaMuxer(audioOutPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val videoId = mVideoMuxer.addTrack(videoMediaFormat)
+            val audioId = mAudioMuxer.addTrack(audioMediaFormat)
             mExtractor.selectTrack(videoTrack)
 
-            mMuxer.start()
 
             val buffer = ByteBuffer.allocate(500 * 1024)
             val info = MediaCodec.BufferInfo()
@@ -87,12 +89,14 @@ class ExtractorActivity : AppCompatActivity() {
 
             var curSampleTime = 0L
             var curSampleFlags = 0
-            var isEOS = false
-            while (!isEOS) {
+            var isVideoEOS = false
+            var isAudioEOS = false
+            mVideoMuxer.start()
+            while (!isVideoEOS) {
                 buffer.clear()
                 videoSize = mExtractor.readSampleData(buffer, 0)
                 if (videoSize < 0) {
-                    isEOS = true
+                    isVideoEOS = true
                     break
                 }
 
@@ -105,11 +109,36 @@ class ExtractorActivity : AppCompatActivity() {
                 info.size = videoSize
                 info.flags = curSampleFlags
                 info.presentationTimeUs = curSampleTime
-                mMuxer.writeSampleData(videoTrack, buffer, info)
+                mVideoMuxer.writeSampleData(videoId, buffer, info)
             }
+
+            mExtractor.selectTrack(audioTrack)
+            mAudioMuxer.start()
+            var audioSize = 0
+            while (!isAudioEOS) {
+                buffer.clear()
+                audioSize = mExtractor.readSampleData(buffer, 0)
+                if (audioSize < 0) {
+                    isAudioEOS = true
+                    break
+                }
+                curSampleFlags = mExtractor.sampleFlags
+                curSampleTime = mExtractor.sampleTime
+
+                mExtractor.advance()
+                info.offset = 0
+                info.size = audioSize
+                info.presentationTimeUs = curSampleTime
+                info.flags = curSampleFlags
+                mAudioMuxer.writeSampleData(audioId, buffer, info)
+            }
+
             mExtractor.release()
-            mMuxer.stop()
-            mMuxer.release()
+            mVideoMuxer.stop()
+            mVideoMuxer.release()
+
+            mAudioMuxer.stop()
+            mAudioMuxer.release()
         }
     }
 
