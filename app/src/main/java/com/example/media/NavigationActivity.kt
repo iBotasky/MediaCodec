@@ -25,5 +25,9 @@ class NavigationActivity : AppCompatActivity() {
         muxerVideo.setOnClickListener {
             startActivity(Intent(NavigationActivity@ this, ExtractorActivity::class.java))
         }
+
+        openGlDrawTriangle.setOnClickListener {
+            startActivity(Intent(NavigationActivity@this, DrawTriangleActivity::class.java))
+        }
     }
 }

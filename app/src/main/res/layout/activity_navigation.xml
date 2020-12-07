@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     android:paddingHorizontal="50dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="音视频相关"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/decodeVideo"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="解码视频"
-        app:layout_constraintBottom_toTopOf="@+id/decodeEncodeVideo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/decodeEncodeVideo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="解编码视频"
-        app:layout_constraintBottom_toTopOf="@id/muxerVideo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/decodeVideo" />
+        android:text="解码视频并渲染" />
 
     <Button
         android:id="@+id/muxerVideo"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="音视频分离"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/decodeEncodeVideo" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:text="音视频分离" />
+
+    <Button
+        android:id="@+id/decodeEncodeVideo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="解编码视频" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OpenGL相关"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/openGlDrawTriangle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="渲染一个三角形" />
+</LinearLayout>
