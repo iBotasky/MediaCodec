@@ -39,7 +39,7 @@ class ExtractorActivity : AppCompatActivity() {
                 withContext(Dispatchers.Default) {
                     extractorVideo()
                 }
-                Toast.makeText(this@ExtractorActivity, "分离视频完成", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ExtractorActivity, "分离音频视频完成", Toast.LENGTH_SHORT).show()
                 it.text = "开始分离音视频"
                 it.isEnabled = true
             }
