@@ -1,6 +1,7 @@
 package com.example.media.Shapes
 
 import android.opengl.GLES20
+import android.util.Log
 import android.view.View
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -10,6 +11,7 @@ import javax.microedition.khronos.opengles.GL10
 
 class Triangle(mView: View) : Shape(mView) {
     companion object {
+        const val TAG = "TriangleDraw"
         const val COORDE_PER_VERTEX = 3
         val TRIANGLE_COORDS = floatArrayOf(
             0.5f, 0.5f, 0.0f,  // top
@@ -18,18 +20,21 @@ class Triangle(mView: View) : Shape(mView) {
         )
     }
 
-    private val vertexShaderCode =
-        "attribute vec4 vPosition;" +
-                "void main(){" +
-                "   gl_Position = vPosition;" +
-                "}"
+    private val vertexShaderCode = """
+        attribute vec4 vPosition;
+            void main() {
+                gl_Position = vPosition;
+            }
+    """.trimIndent()
 
-    private val fragmentShaderCode =
-        "precision mediump float;" +
-                "uniform vec4 vColor;" +
-                "void main(){" +
-                "   gl_FragColor = vColor;" +
-                "}"
+    private val fragmentShaderCode = """
+        precision mediump float;
+            uniform vec4 vColor;
+                void main() {
+                    gl_FragColor = vColor;
+                }
+    """.trimIndent()
+
 
     private var mProgram = -1
     private var mPositionHandle = -1
@@ -49,6 +54,7 @@ class Triangle(mView: View) : Shape(mView) {
     private val color = floatArrayOf(1.0f, 1.0f, 1.0f, 1.0f)
 
     init {
+        Log.e(TAG, "===============onInit")
         val byteBuffer = ByteBuffer.allocateDirect(TRIANGLE_COORDS.size * 4)
         byteBuffer.order(ByteOrder.nativeOrder())
 
@@ -59,6 +65,8 @@ class Triangle(mView: View) : Shape(mView) {
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
+        mProgram = GLES20.glCreateProgram()
+
         // 创建一个空的opengles程序
         GLES20.glAttachShader(mProgram, vertexShader)
         GLES20.glAttachShader(mProgram, fragmentShader)
@@ -68,6 +76,7 @@ class Triangle(mView: View) : Shape(mView) {
 
 
     override fun onDrawFrame(gl: GL10?) {
+        Log.e(TAG, "===============onDrawFrame")
         GLES20.glUseProgram(mProgram)
         //获取顶点着色器的vPosition成员句柄
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition")

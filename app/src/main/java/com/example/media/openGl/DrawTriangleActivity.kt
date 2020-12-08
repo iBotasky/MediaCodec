@@ -7,12 +7,15 @@ import com.example.media.Shapes.Triangle
 import kotlinx.android.synthetic.main.activity_draw_triangle.*
 
 class DrawTriangleActivity : AppCompatActivity() {
+    private lateinit var glSurfaceView: GLSurfaceView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_draw_triangle)
-        glSurfaceView.setEGLContextClientVersion(2)
-        glSurfaceView.setRenderer(Triangle(glSurfaceView))
-        glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
+
+        // 创建一个GLSurfaceView，并设置到Activity
+        glSurfaceView = GLSurfaceView(this)
+        setContentView(glSurfaceView)
     }
 
     override fun onResume() {
