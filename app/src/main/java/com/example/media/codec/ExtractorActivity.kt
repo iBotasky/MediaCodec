@@ -1,4 +1,4 @@
-package com.example.media
+package com.example.media.codec
 
 import android.media.MediaCodec
 import android.media.MediaExtractor
@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.media.R
 import kotlinx.android.synthetic.main.activity_extractor.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -23,9 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DecodeActivity" />
-        <activity android:name=".ExtractorActivity" />
-        <activity android:name=".DrawTriangleActivity" />
+        <activity android:name=".codec.DecodeActivity" />
+        <activity android:name=".codec.ExtractorActivity" />
+        <activity android:name=".openGl.DrawTriangleActivity" />
     </application>
 
 </manifest>

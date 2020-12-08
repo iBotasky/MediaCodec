@@ -3,6 +3,9 @@ package com.example.media
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.media.codec.DecodeActivity
+import com.example.media.codec.ExtractorActivity
+import com.example.media.openGl.DrawTriangleActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 
 class NavigationActivity : AppCompatActivity() {

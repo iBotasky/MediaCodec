@@ -1,10 +1,8 @@
-package com.example.media
+package com.example.media.openGl
 
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.media.Shapes.Triangle
-import kotlinx.android.synthetic.main.activity_draw_triangle.*
 
 class DrawTriangleActivity : AppCompatActivity() {
     private lateinit var glSurfaceView: GLSurfaceView

@@ -1,4 +1,4 @@
-package com.example.media
+package com.example.media.codec
 
 import android.media.MediaCodec
 import android.media.MediaExtractor
@@ -9,9 +9,9 @@ import android.util.Log
 import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.media.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
