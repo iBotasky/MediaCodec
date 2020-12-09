@@ -31,6 +31,7 @@ class MGLRenderer : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         Log.e(TAG, "onSurfaceCreate")
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f)
+        triangle.initProgram()
     }
 
 }

@@ -61,7 +61,7 @@ class Triangle {
     // RGBA
     private val color = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
 
-    init {
+    fun initProgram() {
         Log.e(TAG, "===============onInit")
 
         val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
@@ -93,6 +93,8 @@ class Triangle {
     }
     fun draw(){
         Log.e(TAG, "===============onDrawFrame")
+        // 清屏操作
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glUseProgram(mProgram)
         //获取顶点着色器的vPosition成员句柄
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition").also {
