@@ -12,7 +12,7 @@ class DrawTriangleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // 创建一个GLSurfaceView，并设置到Activity
-        glSurfaceView = GLSurfaceView(this)
+        glSurfaceView = MGLSurfaceView(this)
         setContentView(glSurfaceView)
     }
 
