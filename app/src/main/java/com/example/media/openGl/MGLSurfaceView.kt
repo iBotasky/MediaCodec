@@ -12,8 +12,8 @@ class MGLSurfaceView(context: Context) : GLSurfaceView(context) {
         setEGLContextClientVersion(2)
 
 //        renderer = MyRenderer()
-//        renderer = TriangleRenderer()
-        renderer = MGLRenderer()
+        renderer = TriangleRenderer()
+//        renderer = MGLRenderer()
         // 设置GLSurface要渲染的Render
         setRenderer(renderer)
 

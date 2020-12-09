@@ -66,7 +66,7 @@ class TriangleRenderer : RendererAbs() {
         uColor = GLES20.glGetUniformLocation(program, "uColor")
 
         // 设置clear color颜色RGBA(这里仅仅是设置清屏时GLES20.glClear()用的颜色值而不是执行清屏)
-        GLES20.glClearColor(1.0f, 1f, 0f, 1.0f)
+        GLES20.glClearColor(.5f, .5f, .5f, 1.0f)
     }
 
     /**
@@ -103,7 +103,7 @@ class TriangleRenderer : RendererAbs() {
         GLES20.glEnableVertexAttribArray(vPosition)
 
         // 设置属性uColor(颜色 索引,R,G,B,A)
-        GLES20.glUniform4f(uColor, 0.0f, 1.0f, 0.0f, 1.0f)
+        GLES20.glUniform4f(uColor, 0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
         // 绘制
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 3)
     }
