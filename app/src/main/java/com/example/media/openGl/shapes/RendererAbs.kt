@@ -1,4 +1,4 @@
-package com.example.media.openGl.Shapes
+package com.example.media.openGl.shapes
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView

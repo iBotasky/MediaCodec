@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.media.codec.DecodeActivity
 import com.example.media.codec.ExtractorActivity
-import com.example.media.openGl.DrawTriangleActivity
+import com.example.media.openGl.DrawShapeActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 
 class NavigationActivity : AppCompatActivity() {
@@ -29,8 +29,8 @@ class NavigationActivity : AppCompatActivity() {
             startActivity(Intent(NavigationActivity@ this, ExtractorActivity::class.java))
         }
 
-        openGlDrawTriangle.setOnClickListener {
-            startActivity(Intent(NavigationActivity@this, DrawTriangleActivity::class.java))
+        openGlDrawShape.setOnClickListener {
+            startActivity(Intent(NavigationActivity@this, DrawShapeActivity::class.java))
         }
     }
 }

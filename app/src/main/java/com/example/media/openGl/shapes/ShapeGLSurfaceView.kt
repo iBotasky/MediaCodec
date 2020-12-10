@@ -1,11 +1,9 @@
-package com.example.media.openGl
+package com.example.media.openGl.shapes
 
 import android.content.Context
 import android.opengl.GLSurfaceView
-import com.example.media.openGl.Shapes.LineRenderer
-import com.example.media.openGl.Shapes.TriangleRenderer
 
-class MGLSurfaceView(context: Context) : GLSurfaceView(context) {
+class ShapeGLSurfaceView(context: Context) : GLSurfaceView(context) {
     private val renderer: GLSurfaceView.Renderer
 
     init {

@@ -3,8 +3,9 @@ package com.example.media.openGl
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.media.openGl.shapes.ShapeGLSurfaceView
 
-class DrawTriangleActivity : AppCompatActivity() {
+class DrawShapeActivity : AppCompatActivity() {
     private lateinit var glSurfaceView: GLSurfaceView
 
 
@@ -12,7 +13,7 @@ class DrawTriangleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // 创建一个GLSurfaceView，并设置到Activity
-        glSurfaceView = MGLSurfaceView(this)
+        glSurfaceView = ShapeGLSurfaceView(this)
         setContentView(glSurfaceView)
     }
 

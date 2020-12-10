@@ -38,8 +38,14 @@
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/openGlDrawTriangle"
+        android:id="@+id/openGlDrawShape"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="渲染一个三角形" />
+        android:text="图形绘制" />
+
+    <Button
+        android:id="@+id/openGlDrawTexture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="纹理绘制" />
 </LinearLayout>
