@@ -2,6 +2,7 @@ package com.example.media.openGl
 
 import android.content.Context
 import android.opengl.GLSurfaceView
+import com.example.media.openGl.Shapes.LineRenderer
 import com.example.media.openGl.Shapes.TriangleRenderer
 
 class MGLSurfaceView(context: Context) : GLSurfaceView(context) {
@@ -11,9 +12,11 @@ class MGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // 穿件一个OpenGl2.0的上下文
         setEGLContextClientVersion(2)
 
-//        renderer = MyRenderer()
+        // 三角形
         renderer = TriangleRenderer()
-//        renderer = MGLRenderer()
+        // 线
+//        renderer = LineRenderer()
+
         // 设置GLSurface要渲染的Render
         setRenderer(renderer)
 
