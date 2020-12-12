@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,8 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DecodeActivity" />
-        <activity android:name=".ExtractorActivity" />
+        <activity android:name=".codec.DecodeActivity" />
+        <activity android:name=".codec.ExtractorActivity" />
+        <activity android:name=".openGl.DrawShapeActivity" />
+        <activity android:name=".openGl.DrawTextureActivity"/>
     </application>
 
 </manifest>

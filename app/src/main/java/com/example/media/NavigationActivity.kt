@@ -3,6 +3,10 @@ package com.example.media
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.media.codec.DecodeActivity
+import com.example.media.codec.ExtractorActivity
+import com.example.media.openGl.DrawShapeActivity
+import com.example.media.openGl.DrawTextureActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 
 class NavigationActivity : AppCompatActivity() {
@@ -24,6 +28,14 @@ class NavigationActivity : AppCompatActivity() {
 
         muxerVideo.setOnClickListener {
             startActivity(Intent(NavigationActivity@ this, ExtractorActivity::class.java))
+        }
+
+        openGlDrawShape.setOnClickListener {
+            startActivity(Intent(NavigationActivity@ this, DrawShapeActivity::class.java))
+        }
+
+        openGlDrawTexture.setOnClickListener {
+            startActivity(Intent(NavigationActivity@ this, DrawTextureActivity::class.java))
         }
     }
 }
