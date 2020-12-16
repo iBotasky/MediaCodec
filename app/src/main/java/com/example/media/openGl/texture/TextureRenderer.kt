@@ -63,7 +63,7 @@ class TextureRenderer(val mContext: Context) : GLSurfaceView.Renderer {
                 gl_Position = aPosition;
             }
         """.trimIndent()
-
+    // 图片纹理Shader
     private val fragmentShader =
         """
             precision mediump float;
@@ -73,6 +73,18 @@ class TextureRenderer(val mContext: Context) : GLSurfaceView.Renderer {
                 gl_FragColor = texture2D(uTexture,vCoordinate);
             }
         """.trimIndent()
+
+    private val videoFragmentShader =
+        //#extension GL_OES_EGL_image_external : require 拓展纹理，YUV->RGB
+        """
+            #extension GL_OES_EGL_image_external : require
+            uniform sampler2D uTexture;
+            varying vec2 vCoordinate;
+            void main(){
+                gl_FragColor = texture2D(uTexture, vCoordinate);
+            }
+        """.trimIndent()
+
 
 
     private val vertexFloatBuffer = ByteBuffer
