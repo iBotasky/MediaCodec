@@ -26,7 +26,8 @@
         <activity android:name=".codec.DecodeActivity" />
         <activity android:name=".codec.ExtractorActivity" />
         <activity android:name=".openGl.DrawShapeActivity" />
-        <activity android:name=".openGl.DrawTextureActivity"/>
+        <activity android:name=".openGl.DrawTextureActivity" />
+        <activity android:name=".openGl.RenderVideoActivity" />
     </application>
 
 </manifest>

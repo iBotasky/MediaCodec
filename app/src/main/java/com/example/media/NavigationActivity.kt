@@ -7,6 +7,7 @@ import com.example.media.codec.DecodeActivity
 import com.example.media.codec.ExtractorActivity
 import com.example.media.openGl.DrawShapeActivity
 import com.example.media.openGl.DrawTextureActivity
+import com.example.media.openGl.RenderVideoActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 
 class NavigationActivity : AppCompatActivity() {
@@ -36,6 +37,10 @@ class NavigationActivity : AppCompatActivity() {
 
         openGlDrawTexture.setOnClickListener {
             startActivity(Intent(NavigationActivity@ this, DrawTextureActivity::class.java))
+        }
+
+        openGlRenderVideo.setOnClickListener {
+            startActivity(Intent(NavigationActivity@ this, RenderVideoActivity::class.java))
         }
     }
 }
