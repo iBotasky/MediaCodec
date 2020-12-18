@@ -11,19 +11,18 @@ class DefaultRender: GLSurfaceView.Renderer {
     private val mDrawers = mutableListOf<IDrawer>()
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        GLES20.glClearColor(0f, 0f, 0f, 0f)
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1f)
         //开启混合，即半透明
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
+        // 根据Drawers生成对应的纹理数量获取纹理ID
+        val textureIds = IntArray(mDrawers.size)
+        GLES20.glGenTextures(mDrawers.size, textureIds, 0) //生成纹理
 
-        mDrawers.forEach {
-            it.onCreate()
+        mDrawers.forEachIndexed { index, iDrawer ->
+            iDrawer.onCreate(textureIds[index])
         }
-//        val textureIds = OpenGLTools.createTextureIds(drawers.size)
-//        for ((idx, drawer) in drawers.withIndex()) {
-//            drawer.setTextureID(textureIds[idx])
-//        }
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
