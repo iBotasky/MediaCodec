@@ -2,8 +2,14 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'com.hujiang.android-aspectjx'
 }
 
+
+aspectjx {
+    exclude 'com.google', 'com.taobao', 'com.appsflyer', 'com.android', 'versions.9'
+    enabled true
+}
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -30,6 +36,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    viewBinding  {
+        enabled = true
     }
 }
 
