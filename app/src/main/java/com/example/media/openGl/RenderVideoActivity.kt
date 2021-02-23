@@ -11,9 +11,9 @@ import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.media.R
+import com.example.media.databinding.ActivityRenderVideoBinding
 import com.example.media.openGl.render.DefaultRender
 import com.example.media.openGl.video.VideoDrawer
-import kotlinx.android.synthetic.main.activity_render_video.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,6 +23,7 @@ class RenderVideoActivity : AppCompatActivity() {
         const val TAG = "RenderVideoActivity"
     }
 
+    private lateinit var binding: ActivityRenderVideoBinding
     private var mVideoTrack: Int = -1
     private var mVideoFormat: MediaFormat? = null
 
@@ -36,23 +37,24 @@ class RenderVideoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_render_video)
+        binding = ActivityRenderVideoBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val drawer = VideoDrawer()
-        glSurfaceView.setEGLContextClientVersion(2)
+        binding.glSurfaceView.setEGLContextClientVersion(2)
         val renderer = DefaultRender()
         renderer.addDrawer(drawer)
-        glSurfaceView.setRenderer(renderer)
-        glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
+        binding.glSurfaceView.setRenderer(renderer)
+        binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
 
-        startRender.setOnClickListener {
+        binding.startRender.setOnClickListener {
             drawer.mSurfaceTexture?.let {
                 Log.e(TAG, "onStartRender")
                 lifecycleScope.launch {
-                    startRender.isEnabled = false
+                    binding.startRender.isEnabled = false
                     withContext(Dispatchers.Default) {
                         startDecodeRender(Surface(it))
                     }
-                    startRender.isEnabled = true
+                    binding.startRender.isEnabled = true
                 }
             }
         }

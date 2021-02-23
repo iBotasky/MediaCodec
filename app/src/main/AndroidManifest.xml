@@ -17,8 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Media">
-        <!--        <activity android:name=".NavigationActivity"></activity>-->
-        <activity android:name=".AOPActivity">
+        <activity android:name=".NavigationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,6 +29,8 @@
         <activity android:name=".openGl.DrawShapeActivity" />
         <activity android:name=".openGl.DrawTextureActivity" />
         <activity android:name=".openGl.RenderVideoActivity" />
+        <activity android:name=".aop.AOPActivity" />
+
     </application>
 
 </manifest>

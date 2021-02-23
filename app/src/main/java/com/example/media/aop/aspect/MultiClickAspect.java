@@ -1,6 +1,8 @@
 package com.example.media.aop.aspect;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,15 +21,16 @@ public class MultiClickAspect {
 
 
     @Around("multiClickCheck()")
-    public void aroundMethod(ProceedingJoinPoint joinpoint) throws Throwable {
+    public void aroundMultiClickMethod(ProceedingJoinPoint joinpoint) throws Throwable {
         Log.e(TAG, "点击前");
+        final Context context = ((Context) joinpoint.getThis());
         long currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis - mLastClickTime > TIME_INTERVAL) {
             joinpoint.proceed();
             Log.e(TAG, "点击后");
             mLastClickTime = currentTimeMillis;
         } else {
-            Log.e(TAG, "点击间隔太短");
+            Toast.makeText(context, "点击间隔太短", Toast.LENGTH_SHORT).show();
         }
     }
 }

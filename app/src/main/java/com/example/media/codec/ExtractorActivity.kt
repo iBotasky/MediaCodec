@@ -12,13 +12,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.media.R
-import kotlinx.android.synthetic.main.activity_extractor.*
+import com.example.media.databinding.ActivityExtractorBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 
 class ExtractorActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityExtractorBinding
+
     val videoOutPath =
         "${Environment.getExternalStorageDirectory().absolutePath}/extractor_video.mp4"
     val audioOutPath =
@@ -31,8 +33,10 @@ class ExtractorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_extractor)
-        startExtractor.setOnClickListener {
+        binding = ActivityExtractorBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+        binding.startExtractor.setOnClickListener {
             lifecycleScope.launch {
                 it.isEnabled = false
                 (it as Button).text = "分离中"
@@ -75,7 +79,7 @@ class ExtractorActivity : AppCompatActivity() {
         }
 
         // 创建Muxer合成器，合成音频/视频/音视频
-        Log.e(TAG, "extractorVideo: ${audioTrack!!} ${videoTrack}" )
+        Log.e(TAG, "extractorVideo: ${audioTrack!!} ${videoTrack}")
         if (videoMediaFormat != null && audioMediaFormat != null) {
             val mVideoMuxer = MediaMuxer(videoOutPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             val mAudioMuxer = MediaMuxer(audioOutPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)

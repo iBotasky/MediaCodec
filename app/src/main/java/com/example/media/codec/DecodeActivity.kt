@@ -9,8 +9,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.media.R
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.media.databinding.ActivityDecodeBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,6 +20,7 @@ class DecodeActivity : AppCompatActivity() {
         const val TAG = "VideoTrack"
     }
 
+    private lateinit var binding: ActivityDecodeBinding
     private var mVideoTrack: Int = -1
     private var mVideoFormat: MediaFormat? = null
 
@@ -34,14 +34,17 @@ class DecodeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        mBtnVideoTrack.setOnClickListener {
+
+        binding = ActivityDecodeBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+        binding.mBtnVideoTrack.setOnClickListener {
             lifecycleScope.launch {
-                mBtnVideoTrack.isEnabled = false
+                binding.mBtnVideoTrack.isEnabled = false
                 withContext(Dispatchers.Default) {
                     startDecodeVideo()
                 }
-                mBtnVideoTrack.isEnabled = true
+                binding.mBtnVideoTrack.isEnabled = true
             }
         }
     }
@@ -68,7 +71,12 @@ class DecodeActivity : AppCompatActivity() {
         // 创建解码器
         val mime = mExtractor.getTrackFormat(mVideoTrack).getString(MediaFormat.KEY_MIME)
         val mVideoDecoder = MediaCodec.createDecoderByType(mime!!)
-        mVideoDecoder.configure(mVideoFormat, Surface(mTextureView.surfaceTexture), null, 0);
+        mVideoDecoder.configure(
+            mVideoFormat,
+            Surface(binding.mTextureView.surfaceTexture),
+            null,
+            0
+        );
         mVideoDecoder.start()
 
         // 开始编码并渲染
