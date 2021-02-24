@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.media.aop.annotations.MultiClickCheck
+import com.example.media.aop.annotations.NetworkCheck
 import com.example.media.databinding.ActivityAOPBinding
 
 class AOPActivity : AppCompatActivity() {
@@ -22,14 +23,23 @@ class AOPActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        binding.btnAop.setOnClickListener {
-            onAOPClick()
+        binding.btnMultiCheck.setOnClickListener {
+            onMultiCheckClick()
+        }
+
+        binding.btnNetworkCheck.setOnClickListener {
+            onNetworkCheck()
         }
     }
 
     @MultiClickCheck
-    private fun onAOPClick() {
+    private fun onMultiCheckClick() {
         Log.e(TAG, "点击了")
-        Toast.makeText(this@AOPActivity,"点击成功",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@AOPActivity, "点击成功", Toast.LENGTH_SHORT).show()
+    }
+
+    @NetworkCheck
+    private fun onNetworkCheck() {
+        Toast.makeText(this@AOPActivity, "链接成功", Toast.LENGTH_SHORT).show()
     }
 }
