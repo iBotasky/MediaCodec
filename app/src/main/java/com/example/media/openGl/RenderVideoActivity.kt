@@ -44,7 +44,8 @@ class RenderVideoActivity : AppCompatActivity() {
         val renderer = DefaultRender()
         renderer.addDrawer(drawer)
         binding.glSurfaceView.setRenderer(renderer)
-        binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
+        // 视频不能加这个，会导致一直不刷新
+//        binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
 
         binding.startRender.setOnClickListener {
             drawer.mSurfaceTexture?.let {

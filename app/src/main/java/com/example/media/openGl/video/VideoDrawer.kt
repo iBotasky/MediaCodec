@@ -1,6 +1,7 @@
 package com.example.media.openGl.video
 
 import android.graphics.SurfaceTexture
+import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.util.Log
 import com.example.media.openGl.render.IDrawer
@@ -19,33 +20,56 @@ class VideoDrawer : IDrawer {
         private const val A_ALPHA = "alpha";
         private const val IN_ALPHA = "inAlpha"
         private const val U_TEXTURE = "uTexture"
-        const val VERTEX_SHADER =
-            """
-            attribute vec4 ${A_POSITION};
-            precision mediump float;
-            attribute vec2 ${A_COORDINATE};
-            varying vec2 ${V_COORDINATE};
-            attribute float ${A_ALPHA};
-            varying float ${IN_ALPHA};
-            void main(){
-                gl_Position =  ${A_POSITION};
-                $V_COORDINATE = ${A_COORDINATE};
-                $IN_ALPHA = $A_ALPHA;
-            }
-            
-        """
 
-        const val FRAGMENT_SHADER = """
-            #extension GL_OES_EGL_image_external : require
-            precision mediump float;
-            varying vec2 $V_COORDINATE;
-            varying float $IN_ALPHA;
-            uniform samplerExternalOES $U_TEXTURE;
-            void main() {
-              vec4 color = texture2D($U_TEXTURE, $V_COORDINATE);
-              gl_FragColor = vec4(color.r, color.g, color.b, $IN_ALPHA);
-            }
-        """
+        //        const val VERTEX_SHADER =
+//            """
+//            attribute vec4 ${A_POSITION};
+//            precision mediump float;
+//            attribute vec2 ${A_COORDINATE};
+//            varying vec2 ${V_COORDINATE};
+//            attribute float ${A_ALPHA};
+//            varying float ${IN_ALPHA};
+//            void main(){
+//                gl_Position =  ${A_POSITION};
+//                $V_COORDINATE = ${A_COORDINATE};
+//                $IN_ALPHA = $A_ALPHA;
+//            }
+//
+//        """
+        const val VERTEX_SHADER = "attribute vec4 aPosition;" +
+                "precision mediump float;" +
+                "attribute vec2 aCoordinate;" +
+                "varying vec2 vCoordinate;" +
+                "attribute float alpha;" +
+                "varying float inAlpha;" +
+                "void main() {" +
+                "    gl_Position = aPosition;" +
+                "    vCoordinate = aCoordinate;" +
+                "    inAlpha = alpha;" +
+                "}"
+
+//        const val FRAGMENT_SHADER = """
+//            #extension GL_OES_EGL_image_external : require
+//            precision mediump float;
+//            varying vec2 $V_COORDINATE;
+//            varying float $IN_ALPHA;
+//            uniform samplerExternalOES $U_TEXTURE;
+//            void main() {
+//              vec4 color = texture2D($U_TEXTURE, $V_COORDINATE);
+//              gl_FragColor = vec4(color.r, color.g, color.b, $IN_ALPHA);
+//            }
+//        """
+
+        const val FRAGMENT_SHADER =
+            "#extension GL_OES_EGL_image_external : require\n" + //一定要加换行"\n"，否则会和下一行的precision混在一起，导致编译出错
+                    "precision mediump float;" +
+                    "varying vec2 vCoordinate;" +
+                    "varying float inAlpha;" +
+                    "uniform samplerExternalOES uTexture;" +
+                    "void main() {" +
+                    "  vec4 color = texture2D(uTexture, vCoordinate);" +
+                    "  gl_FragColor = vec4(color.r, color.g, color.b, inAlpha);" +
+                    "}"
     }
 
     private val mVertexCoors = floatArrayOf(
@@ -158,38 +182,39 @@ class VideoDrawer : IDrawer {
             return
         }
         // 获取句柄
-        mVertexPosHandle = GLES20.glGetAttribLocation(mProgram, A_POSITION)
-        mTexturePosHandle = GLES20.glGetAttribLocation(mProgram, A_COORDINATE)
-        mTextureHandle = GLES20.glGetUniformLocation(mProgram, U_TEXTURE)
-        mAlphaHandle = GLES20.glGetAttribLocation(mProgram, A_ALPHA)
+        mVertexPosHandle = GLES20.glGetAttribLocation(mProgram, "aPosition")
+        mTexturePosHandle = GLES20.glGetAttribLocation(mProgram, "aCoordinate")
+        mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture")
+        mAlphaHandle = GLES20.glGetAttribLocation(mProgram, "alpha")
 
+        GLES20.glUseProgram(mProgram)
         //激活指定纹理单元
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         //绑定纹理ID到纹理单元
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId)
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureId)
         //将激活的纹理单元传递到着色器里面
         GLES20.glUniform1i(mTextureHandle, 0)
         //配置边缘过渡参数
         GLES20.glTexParameterf(
-            GLES20.GL_TEXTURE_2D,
+            GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
             GLES20.GL_TEXTURE_MIN_FILTER,
             GLES20.GL_LINEAR.toFloat()
         )
         GLES20.glTexParameterf(
-            GLES20.GL_TEXTURE_2D,
+            GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
             GLES20.GL_TEXTURE_MAG_FILTER,
             GLES20.GL_LINEAR.toFloat()
         )
         GLES20.glTexParameteri(
-            GLES20.GL_TEXTURE_2D,
+            GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
             GLES20.GL_TEXTURE_WRAP_S,
             GLES20.GL_CLAMP_TO_EDGE
         )
         GLES20.glTexParameteri(
-            GLES20.GL_TEXTURE_2D,
+            GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
             GLES20.GL_TEXTURE_WRAP_T,
             GLES20.GL_CLAMP_TO_EDGE
         )
+
     }
 
     override fun release() {
