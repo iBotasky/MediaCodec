@@ -5,9 +5,11 @@ interface IDrawer {
 
     fun onCreate(textureId: Int)
 
-    fun onChange(width: Int, height: Int)
-
     fun onDrawFrame()
+
+    fun setVideoSize(width: Int, height: Int)
+
+    fun setPlayerSize(width: Int, height: Int)
 
     fun release()
 }

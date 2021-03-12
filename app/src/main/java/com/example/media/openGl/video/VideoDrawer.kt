@@ -3,6 +3,7 @@ package com.example.media.openGl.video
 import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
+import android.opengl.Matrix
 import android.util.Log
 import com.example.media.openGl.render.IDrawer
 import com.example.media.openGl.utils.Constants
@@ -39,11 +40,12 @@ class VideoDrawer : IDrawer {
         const val VERTEX_SHADER = "attribute vec4 aPosition;" +
                 "precision mediump float;" +
                 "attribute vec2 aCoordinate;" +
+                "uniform mat4 uMatrix;" +
                 "varying vec2 vCoordinate;" +
                 "attribute float alpha;" +
                 "varying float inAlpha;" +
                 "void main() {" +
-                "    gl_Position = aPosition;" +
+                "    gl_Position = aPosition*uMatrix;" +
                 "    vCoordinate = aCoordinate;" +
                 "    inAlpha = alpha;" +
                 "}"
@@ -119,6 +121,80 @@ class VideoDrawer : IDrawer {
     private var mMatrix: FloatArray? = null
     private var mAlpha = 1f
 
+
+    override fun setVideoSize(width: Int, height: Int) {
+        mVideoWidth = width
+        mVideoHeight = height
+
+    }
+
+    override fun setPlayerSize(width: Int, height: Int) {
+        mWorldWidth = width
+        mWorldHeight = height
+
+    }
+    private var mWidthRatio = 1f
+    private var mHeightRatio = 1f
+    private fun initDefMatrix() {
+        if (mMatrix != null) return
+        if (mVideoWidth != -1 && mVideoHeight != -1 &&
+            mWorldWidth != -1 && mWorldHeight != -1) {
+            mMatrix = FloatArray(16)
+            var prjMatrix = FloatArray(16)
+            val originRatio = mVideoWidth / mVideoHeight.toFloat()
+            val worldRatio = mWorldWidth / mWorldHeight.toFloat()
+            if (mWorldWidth > mWorldHeight) {
+                if (originRatio > worldRatio) {
+                    mHeightRatio = originRatio / worldRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
+                        3f, 5f
+                    )
+                } else {// 原始比例小于窗口比例，缩放高度度会导致高度超出，因此，高度以窗口为准，缩放宽度
+                    mWidthRatio = worldRatio / originRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
+                        3f, 5f
+                    )
+                }
+            } else {
+                if (originRatio > worldRatio) {
+                    mHeightRatio = originRatio / worldRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
+                        3f, 5f
+                    )
+                } else {// 原始比例小于窗口比例，缩放高度会导致高度超出，因此，高度以窗口为准，缩放宽度
+                    mWidthRatio = worldRatio / originRatio
+                    Matrix.orthoM(
+                        prjMatrix, 0,
+                        -mWidthRatio, mWidthRatio,
+                        -mHeightRatio, mHeightRatio,
+                        3f, 5f
+                    )
+                }
+            }
+
+            //设置相机位置
+            val viewMatrix = FloatArray(16)
+            Matrix.setLookAtM(
+                viewMatrix, 0,
+                0f, 0f, 5.0f,
+                0f, 0f, 0f,
+                0f, 1.0f, 0f
+            )
+            //计算变换矩阵
+            Matrix.multiplyMM(mMatrix, 0, prjMatrix, 0, viewMatrix, 0)
+        }
+    }
+
+
     override fun onCreate(textureId: Int) {
         Log.e(TAG, "onCreate")
         mTextureId = textureId
@@ -128,19 +204,22 @@ class VideoDrawer : IDrawer {
         createProgram()
     }
 
-    override fun onChange(width: Int, height: Int) {
-        Log.e(TAG, "onChange")
-    }
-
     override fun onDrawFrame() {
         Log.e(TAG, "onDrawFrame")
+
+        initDefMatrix()
+        if (mMatrix == null) return
         updateTexture()
         // 启用顶点句柄
         GLES20.glEnableVertexAttribArray(mVertexPosHandle)
         GLES20.glEnableVertexAttribArray(mTexturePosHandle)
 
+        Log.e(TAG," onDrawFrame2")
+        // 【新增3: 将变换矩阵传递给顶点着色器】
+        GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrix, 0)
+
         //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
-        GLES20.glVertexAttribPointer(mVertexPosHandle, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
+//        GLES20.glVertexAttribPointer(mVertexPosHandle, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
         GLES20.glVertexAttribPointer(
             mTexturePosHandle,
             2,
@@ -186,6 +265,7 @@ class VideoDrawer : IDrawer {
         mTexturePosHandle = GLES20.glGetAttribLocation(mProgram, "aCoordinate")
         mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture")
         mAlphaHandle = GLES20.glGetAttribLocation(mProgram, "alpha")
+        mMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMatrix")
 
         GLES20.glUseProgram(mProgram)
         //激活指定纹理单元

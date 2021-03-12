@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.media.R
 import com.example.media.databinding.ActivityRenderVideoBinding
 import com.example.media.openGl.render.DefaultRender
 import com.example.media.openGl.video.VideoDrawer
@@ -43,9 +42,12 @@ class RenderVideoActivity : AppCompatActivity() {
         binding.glSurfaceView.setEGLContextClientVersion(2)
         val renderer = DefaultRender()
         renderer.addDrawer(drawer)
+        val size = getVideoInfo()
+        drawer.setVideoSize(size[0], size[1])
+
         binding.glSurfaceView.setRenderer(renderer)
         // 视频不能加这个，会导致一直不刷新
-//        binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
+        binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
 
         binding.startRender.setOnClickListener {
             drawer.mSurfaceTexture?.let {
@@ -53,6 +55,7 @@ class RenderVideoActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     binding.startRender.isEnabled = false
                     withContext(Dispatchers.Default) {
+
                         startDecodeRender(Surface(it))
                     }
                     binding.startRender.isEnabled = true
@@ -62,21 +65,41 @@ class RenderVideoActivity : AppCompatActivity() {
     }
 
 
+    private fun getVideoInfo(): IntArray {
+        val extractor = MediaExtractor()
+        extractor.setDataSource(ORIGINAL_VIDEO)
+        val size = IntArray(size = 2)
+        for (i in 0 until extractor.trackCount) {
+            val mediaFormat = extractor.getTrackFormat(i)
+            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
+            if (mime != null && mime.startsWith("video/")) {
+                mVideoTrack = i
+                mVideoFormat = mediaFormat
+                size[0] = mediaFormat.getInteger(MediaFormat.KEY_WIDTH)
+                size[1] = mediaFormat.getInteger(MediaFormat.KEY_HEIGHT)
+                break
+            }
+
+        }
+        return size
+    }
+
+
     private fun startDecodeRender(surface: Surface) {
         Log.e(TAG, "===============初始化解编码器===============")
         val mExtractor = MediaExtractor()
         mExtractor.setDataSource(ORIGINAL_VIDEO)
         // 遍历提取器的轨道，获取格式
 
-        for (i in 0 until mExtractor.trackCount) {
-            val mediaFormat = mExtractor.getTrackFormat(i)
-            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
-            if (mime != null && mime.startsWith("video/")) {
-                mVideoTrack = i
-                mVideoFormat = mediaFormat
-                break
-            }
-        }
+//        for (i in 0 until mExtractor.trackCount) {
+//            val mediaFormat = mExtractor.getTrackFormat(i)
+//            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
+//            if (mime != null && mime.startsWith("video/")) {
+//                mVideoTrack = i
+//                mVideoFormat = mediaFormat
+//                break
+//            }
+//        }
         if (mVideoTrack >= 0) {
             mExtractor.selectTrack(mVideoTrack)
         }
@@ -171,6 +194,7 @@ class RenderVideoActivity : AppCompatActivity() {
                             if (outputId >= 0) {
                                 //释放buffer，并渲染到 Surface 中
                                 this.releaseOutputBuffer(outputId, true)
+                                binding.glSurfaceView.requestRender()
                             }
                         }
                     }

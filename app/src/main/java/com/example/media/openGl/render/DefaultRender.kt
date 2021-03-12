@@ -33,7 +33,7 @@ class DefaultRender : GLSurfaceView.Renderer {
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
         mDrawers.forEach {
-            it.onChange(width, height)
+            it.setPlayerSize(width, height)
         }
     }
 
