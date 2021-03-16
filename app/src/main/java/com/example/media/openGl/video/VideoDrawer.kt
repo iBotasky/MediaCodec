@@ -191,6 +191,8 @@ class VideoDrawer : IDrawer {
             )
             //计算变换矩阵
             Matrix.multiplyMM(mMatrix, 0, prjMatrix, 0, viewMatrix, 0)
+
+            Log.e("Ratio", "WidthRatio:$mWidthRatio HeightRation:$mHeightRatio")
         }
     }
 
@@ -219,7 +221,7 @@ class VideoDrawer : IDrawer {
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrix, 0)
 
         //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
-//        GLES20.glVertexAttribPointer(mVertexPosHandle, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
+        GLES20.glVertexAttribPointer(mVertexPosHandle, 2, GLES20.GL_FLOAT, false, 0, mVertexBuffer)
         GLES20.glVertexAttribPointer(
             mTexturePosHandle,
             2,
