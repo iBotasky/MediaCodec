@@ -13,9 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.media.databinding.ActivityRenderVideoBinding
 import com.example.media.openGl.render.DefaultRender
 import com.example.media.openGl.video.VideoDrawer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+
 
 class RenderVideoActivity : AppCompatActivity() {
     companion object {
@@ -23,8 +22,7 @@ class RenderVideoActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityRenderVideoBinding
-    private var mVideoTrack: Int = -1
-    private var mVideoFormat: MediaFormat? = null
+
 
     private var isRunning = false   // 用来做整个流程的运行判断，当最后一帧渲染结束即为false
     private var isEOS =
@@ -32,49 +30,79 @@ class RenderVideoActivity : AppCompatActivity() {
 
     // App运行后直接在手机上给权限即可，不添加权限申请了
     val ORIGINAL_VIDEO = "${Environment.getExternalStorageDirectory().absolutePath}/1.mp4"
-
+    val ORIGINAL_VIDEO_2 = "${Environment.getExternalStorageDirectory().absolutePath}/2.mp4"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRenderVideoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val drawer = VideoDrawer()
         binding.glSurfaceView.setEGLContextClientVersion(2)
+        val drawer = VideoDrawer()
         val renderer = DefaultRender()
-        renderer.addDrawer(drawer)
-        val size = getVideoInfo()
+        val size = getVideoInfo(ORIGINAL_VIDEO)
         drawer.setVideoSize(size[0], size[1])
+        val drawer2 = VideoDrawer()
+        val size2 = getVideoInfo(ORIGINAL_VIDEO_2)
+        drawer2.setVideoSize(size2[0], size2[1])
+        drawer2.mAlpha = 0.5f
+        renderer.addDrawer(drawer)
+        renderer.addDrawer(drawer2)
+
 
         binding.glSurfaceView.setRenderer(renderer)
         // 视频不能加这个，会导致一直不刷新
         binding.glSurfaceView.renderMode = RENDERMODE_WHEN_DIRTY
 
         binding.startRender.setOnClickListener {
-            drawer.mSurfaceTexture?.let {
-                Log.e(TAG, "onStartRender")
+//            drawer.mSurfaceTexture?.let {
+//                Log.e(TAG, "onStartRender")
+//                lifecycleScope.launch {
+//                    binding.startRender.isEnabled = false
+////                    withContext(Dispatchers.Default) {
+////                        startDecodeRender(ORIGINAL_VIDEO, Surface(it))
+////                    }
+//                    withContext(Dispatchers.Default) {
+//                        startDecodeRender(ORIGINAL_VIDEO_2, Surface(it))
+//                    }
+//                    binding.startRender.isEnabled = true
+//                }
+//            }
+
+            if (drawer2.mSurfaceTexture != null && drawer.mSurfaceTexture != null) {
+
                 lifecycleScope.launch {
                     binding.startRender.isEnabled = false
-                    withContext(Dispatchers.Default) {
+                    withContext(Dispatchers.IO) {
 
-                        startDecodeRender(Surface(it))
+                        async {
+                            startDecodeRender(
+                                `ORIGINAL_VIDEO_2`,
+                                Surface(drawer2.mSurfaceTexture)
+                            )
+                        }
+                        async {
+                            startDecodeRender(ORIGINAL_VIDEO, Surface(drawer.mSurfaceTexture))
+                        }
+
+
                     }
+
                     binding.startRender.isEnabled = true
+
                 }
             }
         }
     }
 
 
-    private fun getVideoInfo(): IntArray {
+    private fun getVideoInfo(videoPath: String): IntArray {
         val extractor = MediaExtractor()
-        extractor.setDataSource(ORIGINAL_VIDEO)
+        extractor.setDataSource(videoPath)
         val size = IntArray(size = 2)
         for (i in 0 until extractor.trackCount) {
             val mediaFormat = extractor.getTrackFormat(i)
             val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
             if (mime != null && mime.startsWith("video/")) {
-                mVideoTrack = i
-                mVideoFormat = mediaFormat
                 size[0] = mediaFormat.getInteger(MediaFormat.KEY_WIDTH)
                 size[1] = mediaFormat.getInteger(MediaFormat.KEY_HEIGHT)
                 break
@@ -85,21 +113,22 @@ class RenderVideoActivity : AppCompatActivity() {
     }
 
 
-    private fun startDecodeRender(surface: Surface) {
+    private suspend fun startDecodeRender(videoPath: String, surface: Surface) {
         Log.e(TAG, "===============初始化解编码器===============")
         val mExtractor = MediaExtractor()
-        mExtractor.setDataSource(ORIGINAL_VIDEO)
+        mExtractor.setDataSource(videoPath)
         // 遍历提取器的轨道，获取格式
-
-//        for (i in 0 until mExtractor.trackCount) {
-//            val mediaFormat = mExtractor.getTrackFormat(i)
-//            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
-//            if (mime != null && mime.startsWith("video/")) {
-//                mVideoTrack = i
-//                mVideoFormat = mediaFormat
-//                break
-//            }
-//        }
+        var mVideoTrack = -1
+        var mVideoFormat: MediaFormat? = null
+        for (i in 0 until mExtractor.trackCount) {
+            val mediaFormat = mExtractor.getTrackFormat(i)
+            val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
+            if (mime != null && mime.startsWith("video/")) {
+                mVideoTrack = i
+                mVideoFormat = mediaFormat
+                break
+            }
+        }
         if (mVideoTrack >= 0) {
             mExtractor.selectTrack(mVideoTrack)
         }

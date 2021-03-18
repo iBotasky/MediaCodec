@@ -119,7 +119,7 @@ class VideoDrawer : IDrawer {
     private lateinit var mTextureBuffer: FloatBuffer
 
     private var mMatrix: FloatArray? = null
-    private var mAlpha = 1f
+    var mAlpha = 1f
 
 
     override fun setVideoSize(width: Int, height: Int) {
@@ -133,12 +133,14 @@ class VideoDrawer : IDrawer {
         mWorldHeight = height
 
     }
+
     private var mWidthRatio = 1f
     private var mHeightRatio = 1f
     private fun initDefMatrix() {
         if (mMatrix != null) return
         if (mVideoWidth != -1 && mVideoHeight != -1 &&
-            mWorldWidth != -1 && mWorldHeight != -1) {
+            mWorldWidth != -1 && mWorldHeight != -1
+        ) {
             mMatrix = FloatArray(16)
             var prjMatrix = FloatArray(16)
             val originRatio = mVideoWidth / mVideoHeight.toFloat()
@@ -191,8 +193,6 @@ class VideoDrawer : IDrawer {
             )
             //计算变换矩阵
             Matrix.multiplyMM(mMatrix, 0, prjMatrix, 0, viewMatrix, 0)
-
-            Log.e("Ratio", "WidthRatio:$mWidthRatio HeightRation:$mHeightRatio")
         }
     }
 
@@ -216,7 +216,7 @@ class VideoDrawer : IDrawer {
         GLES20.glEnableVertexAttribArray(mVertexPosHandle)
         GLES20.glEnableVertexAttribArray(mTexturePosHandle)
 
-        Log.e(TAG," onDrawFrame2")
+        Log.e(TAG, " onDrawFrame2")
         // 【新增3: 将变换矩阵传递给顶点着色器】
         GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMatrix, 0)
 
