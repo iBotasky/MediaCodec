@@ -13,10 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.media.databinding.ActivityRenderVideoBinding
 import com.example.media.openGl.render.DefaultRender
 import com.example.media.openGl.video.VideoDrawer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 
 class RenderVideoActivity : AppCompatActivity() {
@@ -145,7 +142,7 @@ class RenderVideoActivity : AppCompatActivity() {
                 try {
                     // 用来存放每次decode帧的bufferInfo
                     val info = MediaCodec.BufferInfo()
-                    while (isRunning) {
+                    while (isRunning && this@withContext.isActive) {
                         Log.e(TAG, "===============Running===============")
                         /**
                          * 延迟 TIME_US 等待拿到空的 input buffer下标，单位为 us
@@ -250,5 +247,11 @@ class RenderVideoActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycleScope.cancel()
     }
 }
