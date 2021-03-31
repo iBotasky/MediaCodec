@@ -249,9 +249,4 @@ class RenderVideoActivity : AppCompatActivity() {
         }
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        lifecycleScope.cancel()
-    }
 }
